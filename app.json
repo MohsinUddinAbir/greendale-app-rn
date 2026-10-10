@@ -2,14 +2,14 @@
   "expo": {
     "scheme": "greendale",
     "userInterfaceStyle": "automatic",
-    "orientation": "default",
+    "orientation": "landscape",
     "web": {
       "output": "static"
     },
-    "name": "greendale",
+    "name": "Greendale",
     "slug": "greendale",
     "android": {
-      "package": "com.anonymous.greendale"
+      "package": "games.greendale.play"
     },
     "plugins": [
       [
@@ -20,6 +20,12 @@
         }
       ],
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e51b52db-747f-416a-b030-afc2b67da0de"
+      }
+    }
   }
 }

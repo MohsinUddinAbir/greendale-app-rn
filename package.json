@@ -1,13 +1,6 @@
 {
   "name": "greendale",
   "scripts": {
-    "anchor": "cd anchor && anchor",
-    "anchor:build": "cd anchor && anchor build",
-    "anchor:deploy:devnet": "cd anchor && anchor build && anchor program deploy --provider.cluster devnet",
-    "anchor:deploy:localnet": "cd anchor && anchor build && anchor program deploy --provider.cluster localnet",
-    "anchor:localnet": "cd anchor && anchor localnet",
-    "anchor:setup": "cd anchor && anchor keys sync && anchor build && cd .. && npm run codama:js",
-    "anchor:test": "cd anchor && anchor test",
     "android": "expo run:android",
     "android:build": "expo prebuild -p android",
     "build": "tsc --noEmit && npm run android:build",
@@ -23,8 +16,8 @@
     "start": "expo start",
     "web": "expo start --web"
   },
-  "displayName": "Expo Kit Anchor example",
-  "description": "A template for building a Solana mobile app with Expo, React Native, Solana Kit, Anchor, and Uniwind.",
+  "displayName": "Greendale",
+  "description": "A full-screen Greendale game app with Android Solana Mobile Wallet Adapter support.",
   "usecase": "Mobile",
   "keywords": [
     "anchor",
@@ -47,6 +40,7 @@
     "expo-constants": "~57.0.5",
     "expo-dev-client": "^57.0.6",
     "expo-linking": "~57.0.3",
+    "expo-navigation-bar": "~57.0.3",
     "expo-router": "~57.0.6",
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.1",
@@ -58,6 +52,7 @@
     "react-native-quick-crypto": "^1.1.6",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.2",
+    "react-native-webview": "13.16.1",
     "tailwindcss": "~4.1.16",
     "uniwind": "~1.0.0"
   },
