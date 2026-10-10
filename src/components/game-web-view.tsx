@@ -18,12 +18,49 @@ import { WebView, type WebViewMessageEvent, type WebViewNavigation } from 'react
 
 const GAME_URL = 'https://play.greendale.games'
 const GAME_BACKGROUND = '#101418'
+const GAME_ZOOM = 1.5
 const PULL_START_ZONE = 48
 const PULL_REFRESH_THRESHOLD = 100
 const INDICATOR_MAX_DISTANCE = 64
 
 const injectedBridge = `
   (() => {
+    const viewportContent = [
+      'width=device-width',
+      'initial-scale=${GAME_ZOOM}',
+      'minimum-scale=${GAME_ZOOM}',
+      'maximum-scale=${GAME_ZOOM}',
+      'user-scalable=no',
+      'viewport-fit=cover'
+    ].join(', ');
+    const setFixedViewport = () => {
+      const root = document.head || document.documentElement;
+      if (!root) return;
+
+      let viewport = document.querySelector('meta[name="viewport"]');
+      if (!viewport) {
+        viewport = document.createElement('meta');
+        viewport.name = 'viewport';
+        root.appendChild(viewport);
+      }
+      if (viewport.content !== viewportContent) {
+        viewport.content = viewportContent;
+      }
+    };
+
+    setFixedViewport();
+    document.addEventListener('DOMContentLoaded', () => {
+      setFixedViewport();
+      if (document.head) {
+        new MutationObserver(setFixedViewport).observe(document.head, {
+          attributes: true,
+          attributeFilter: ['content'],
+          childList: true,
+          subtree: true
+        });
+      }
+    }, { once: true });
+
     window.SolanaWallet = window.SolanaWallet || {};
     window.SolanaWallet.postMessage = (message) => {
       window.ReactNativeWebView.postMessage(
@@ -180,7 +217,6 @@ export function GameWebView() {
       // eslint-disable-next-line react-hooks/refs
       PanResponder.create({
         onMoveShouldSetPanResponderCapture: (_event, gesture) =>
-          Platform.OS === 'android' &&
           isPageLoaded &&
           !isRefreshing &&
           gesture.y0 <= PULL_START_ZONE &&
@@ -236,7 +272,7 @@ export function GameWebView() {
         injectedJavaScriptBeforeContentLoaded={injectedBridge}
         onMessage={(event) => void handleWalletMessage(event)}
         onNavigationStateChange={handleNavigationChange}
-        pullToRefreshEnabled={Platform.OS === 'ios'}
+        pullToRefreshEnabled={false}
         onLoadStart={() => {
           setIsPageLoaded(false)
           setPageError(null)
