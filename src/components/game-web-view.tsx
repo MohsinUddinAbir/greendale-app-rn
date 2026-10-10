@@ -18,7 +18,7 @@ import { WebView, type WebViewMessageEvent, type WebViewNavigation } from 'react
 
 const GAME_URL = 'https://play.greendale.games'
 const GAME_BACKGROUND = '#101418'
-const GAME_ZOOM = 1.5
+const GAME_ZOOM = 0.75
 const PULL_START_ZONE = 48
 const PULL_REFRESH_THRESHOLD = 100
 const INDICATOR_MAX_DISTANCE = 64
