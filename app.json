@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "scheme": "greendale",
+    "userInterfaceStyle": "automatic",
+    "orientation": "default",
+    "web": {
+      "output": "static"
+    },
+    "name": "greendale",
+    "slug": "greendale",
+    "android": {
+      "package": "com.anonymous.greendale"
+    },
+    "plugins": [
+      [
+        "expo-dev-client",
+        {
+          "showMenuAtLaunch": false,
+          "skipOnboarding": true
+        }
+      ],
+      "expo-router"
+    ]
+  }
+}

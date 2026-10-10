@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "integration-privy": {
+      "source": "solana-mobile/solana-mobile-dev-skill",
+      "sourceType": "github",
+      "skillPath": "skills/integration-privy/SKILL.md",
+      "computedHash": "ed0596d46497b6b9586873db1c2707b210f6a9259ee64f546bf1445beb1a65ef"
+    },
+    "seeker-connect": {
+      "source": "solana-mobile/solana-mobile-dev-skill",
+      "sourceType": "github",
+      "skillPath": "skills/seeker-connect/SKILL.md",
+      "computedHash": "b0aa0f1aa7886d370df638ad2b9b2b2f33cd9cf5b8cd6c8526d142a6f5474c5e"
+    },
+    "seeker-domains": {
+      "source": "solana-mobile/solana-mobile-dev-skill",
+      "sourceType": "github",
+      "skillPath": "skills/seeker-domains/SKILL.md",
+      "computedHash": "69a8ea888364cdac150fe75850945ed05d9284b7d31f24ea30c08c8b7a05869d"
+    },
+    "seeker-genesis-token": {
+      "source": "solana-mobile/solana-mobile-dev-skill",
+      "sourceType": "github",
+      "skillPath": "skills/seeker-genesis-token/SKILL.md",
+      "computedHash": "416ab66556ef03a6103a7e5c97ce7d0fdf15cd628ef51a4bbb8271b7554eac7f"
+    },
+    "solana-dev": {
+      "source": "solana-foundation/solana-dev-skill",
+      "sourceType": "github",
+      "skillPath": "skills/solana-dev/SKILL.md",
+      "computedHash": "ab875c4ed4960b31b81b185bbd4268a1430c402ec2091f44c641468f0d3208d6"
+    },
+    "solana-mobile": {
+      "source": "solana-mobile/solana-mobile-dev-skill",
+      "sourceType": "github",
+      "skillPath": "skills/solana-mobile/SKILL.md",
+      "computedHash": "3405b7055f135622b6fe3b287518acb1c65127d30fca411a7e5e5687d8b9eaff"
+    },
+    "solana-mobile-publishing": {
+      "source": "solana-mobile/solana-mobile-dev-skill",
+      "sourceType": "github",
+      "skillPath": "skills/solana-mobile-publishing/SKILL.md",
+      "computedHash": "70569ff8497ade585f83b171c38fd70866d5279b617b64c5ee04033c7b17965b"
+    },
+    "solana-mobile-wallet": {
+      "source": "solana-mobile/solana-mobile-dev-skill",
+      "sourceType": "github",
+      "skillPath": "skills/solana-mobile-wallet/SKILL.md",
+      "computedHash": "cda0d353331bf6f1d4746ac6445235c6dc61d6ac09688e24a8566e667d5c15de"
+    }
+  }
+}
