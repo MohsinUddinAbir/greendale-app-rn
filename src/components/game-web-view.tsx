@@ -13,54 +13,69 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native'
 import { WebView, type WebViewMessageEvent, type WebViewNavigation } from 'react-native-webview'
 
 const GAME_URL = 'https://play.greendale.games'
 const GAME_BACKGROUND = '#101418'
 const GAME_ZOOM = 0.75
+const GAME_ZOOM_REFERENCE_WIDTH = 390
+const MIN_GAME_ZOOM = 0.3
+const MAX_GAME_ZOOM = 1
 const PULL_START_ZONE = 48
 const PULL_REFRESH_THRESHOLD = 100
 const INDICATOR_MAX_DISTANCE = 64
 
-const injectedBridge = `
-  (() => {
-    const viewportContent = [
-      'width=device-width',
-      'initial-scale=${GAME_ZOOM}',
-      'minimum-scale=${GAME_ZOOM}',
-      'maximum-scale=${GAME_ZOOM}',
-      'user-scalable=no',
-      'viewport-fit=cover'
-    ].join(', ');
-    const setFixedViewport = () => {
-      const root = document.head || document.documentElement;
-      if (!root) return;
+function createViewportScript(zoom: number) {
+  return `
+    (() => {
+      const viewportContent = [
+        'width=device-width',
+        'initial-scale=1',
+        'minimum-scale=1',
+        'maximum-scale=1',
+        'user-scalable=no',
+        'viewport-fit=cover'
+      ].join(', ');
 
-      let viewport = document.querySelector('meta[name="viewport"]');
-      if (!viewport) {
-        viewport = document.createElement('meta');
-        viewport.name = 'viewport';
-        root.appendChild(viewport);
-      }
-      if (viewport.content !== viewportContent) {
-        viewport.content = viewportContent;
-      }
-    };
+      const setFixedViewport = () => {
+        const root = document.documentElement;
+        if (!root) return;
 
-    setFixedViewport();
-    document.addEventListener('DOMContentLoaded', () => {
+        let viewport = document.querySelector('meta[name="viewport"]');
+        if (!viewport) {
+          viewport = document.createElement('meta');
+          viewport.name = 'viewport';
+          (document.head || root).appendChild(viewport);
+        }
+        if (viewport.content !== viewportContent) {
+          viewport.content = viewportContent;
+        }
+        root.style.zoom = '${zoom}';
+      };
+
       setFixedViewport();
-      if (document.head) {
-        new MutationObserver(setFixedViewport).observe(document.head, {
-          attributes: true,
-          attributeFilter: ['content'],
-          childList: true,
-          subtree: true
-        });
-      }
-    }, { once: true });
+      document.addEventListener('DOMContentLoaded', () => {
+        setFixedViewport();
+        if (document.head) {
+          const observer = new MutationObserver(setFixedViewport);
+          observer.observe(document.head, {
+            attributes: true,
+            attributeFilter: ['content'],
+            childList: true,
+            subtree: true
+          });
+        }
+      }, { once: true });
+    })();
+    true;
+  `
+}
 
+function createInjectedBridge(zoom: number) {
+  return `
+  (() => {
     window.SolanaWallet = window.SolanaWallet || {};
     window.SolanaWallet.postMessage = (message) => {
       window.ReactNativeWebView.postMessage(
@@ -69,7 +84,9 @@ const injectedBridge = `
     };
   })();
   true;
+  ${createViewportScript(zoom)}
 `
+}
 
 type WalletRequest = {
   id?: unknown
@@ -107,7 +124,9 @@ function requireBase64Field(value: unknown, fieldName: string): Uint8Array {
 export function GameWebView() {
   const webView = useRef<WebView | null>(null)
   const walletRequestInProgress = useRef(false)
+  const { width } = useWindowDimensions()
   const { account, connect, disconnect, signMessages, signTransactions } = useMobileWallet()
+  const gameZoom = Math.min(MAX_GAME_ZOOM, Math.max(MIN_GAME_ZOOM, (GAME_ZOOM * width) / GAME_ZOOM_REFERENCE_WIDTH))
   const [canGoBack, setCanGoBack] = useState(false)
   const [isPageLoaded, setIsPageLoaded] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -254,6 +273,12 @@ export function GameWebView() {
     return () => subscription.remove()
   }, [canGoBack])
 
+  useEffect(() => {
+    if (isPageLoaded) {
+      webView.current?.injectJavaScript(createViewportScript(gameZoom))
+    }
+  }, [gameZoom, isPageLoaded])
+
   function handleNavigationChange(navigation: WebViewNavigation) {
     setCanGoBack(navigation.canGoBack)
   }
@@ -269,7 +294,7 @@ export function GameWebView() {
         containerStyle={styles.webView}
         javaScriptEnabled
         domStorageEnabled
-        injectedJavaScriptBeforeContentLoaded={injectedBridge}
+        injectedJavaScriptBeforeContentLoaded={createInjectedBridge(gameZoom)}
         onMessage={(event) => void handleWalletMessage(event)}
         onNavigationStateChange={handleNavigationChange}
         pullToRefreshEnabled={false}
