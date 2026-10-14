@@ -19,63 +19,54 @@ import { WebView, type WebViewMessageEvent, type WebViewNavigation } from 'react
 
 const GAME_URL = 'https://play.greendale.games'
 const GAME_BACKGROUND = '#101418'
-const GAME_ZOOM = 0.75
-const GAME_ZOOM_REFERENCE_WIDTH = 390
-const MIN_GAME_ZOOM = 0.3
-const MAX_GAME_ZOOM = 1
+const GAME_ZOOM = 0.6
+const GAME_ZOOM_REFERENCE_WIDTH = 900
+const MIN_GAME_ZOOM = 0.2
+const MAX_GAME_ZOOM = 0.9
 const PULL_START_ZONE = 48
 const PULL_REFRESH_THRESHOLD = 100
 const INDICATOR_MAX_DISTANCE = 64
 
-function createViewportScript(zoom: number) {
-  return `
-    (() => {
-      const viewportContent = [
-        'width=device-width',
-        'initial-scale=1',
-        'minimum-scale=1',
-        'maximum-scale=1',
-        'user-scalable=no',
-        'viewport-fit=cover'
-      ].join(', ');
-
-      const setFixedViewport = () => {
-        const root = document.documentElement;
-        if (!root) return;
-
-        let viewport = document.querySelector('meta[name="viewport"]');
-        if (!viewport) {
-          viewport = document.createElement('meta');
-          viewport.name = 'viewport';
-          (document.head || root).appendChild(viewport);
-        }
-        if (viewport.content !== viewportContent) {
-          viewport.content = viewportContent;
-        }
-        root.style.zoom = '${zoom}';
-      };
-
-      setFixedViewport();
-      document.addEventListener('DOMContentLoaded', () => {
-        setFixedViewport();
-        if (document.head) {
-          const observer = new MutationObserver(setFixedViewport);
-          observer.observe(document.head, {
-            attributes: true,
-            attributeFilter: ['content'],
-            childList: true,
-            subtree: true
-          });
-        }
-      }, { once: true });
-    })();
-    true;
-  `
-}
-
 function createInjectedBridge(zoom: number) {
   return `
   (() => {
+    const viewportContent = [
+      'width=device-width',
+      'initial-scale=${zoom}',
+      'minimum-scale=${zoom}',
+      'maximum-scale=${zoom}',
+      'user-scalable=no',
+      'viewport-fit=cover'
+    ].join(', ');
+    const setFixedViewport = () => {
+      const root = document.head || document.documentElement;
+      if (!root) return;
+
+      let viewport = document.querySelector('meta[name="viewport"]');
+      if (!viewport) {
+        viewport = document.createElement('meta');
+        viewport.name = 'viewport';
+        root.appendChild(viewport);
+      }
+      if (viewport.content !== viewportContent) {
+        viewport.content = viewportContent;
+      }
+    };
+
+    setFixedViewport();
+    document.addEventListener('DOMContentLoaded', () => {
+      setFixedViewport();
+      if (document.head) {
+        new MutationObserver(setFixedViewport).observe(document.head, {
+          attributes: true,
+          attributeFilter: ['content'],
+          childList: true,
+          subtree: true
+        });
+      }
+    }, { once: true });
+
+    window.GreendaleApp = true;
     window.SolanaWallet = window.SolanaWallet || {};
     window.SolanaWallet.postMessage = (message) => {
       window.ReactNativeWebView.postMessage(
@@ -84,7 +75,6 @@ function createInjectedBridge(zoom: number) {
     };
   })();
   true;
-  ${createViewportScript(zoom)}
 `
 }
 
@@ -272,12 +262,6 @@ export function GameWebView() {
 
     return () => subscription.remove()
   }, [canGoBack])
-
-  useEffect(() => {
-    if (isPageLoaded) {
-      webView.current?.injectJavaScript(createViewportScript(gameZoom))
-    }
-  }, [gameZoom, isPageLoaded])
 
   function handleNavigationChange(navigation: WebViewNavigation) {
     setCanGoBack(navigation.canGoBack)
