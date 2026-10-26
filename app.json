@@ -49,6 +49,12 @@
       "eas": {
         "projectId": "e51b52db-747f-416a-b030-afc2b67da0de"
       }
+    },
+    "ios": {
+      "bundleIdentifier": "games.greendale.play",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     }
   }
 }

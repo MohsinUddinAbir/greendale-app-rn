@@ -114,6 +114,7 @@ function requireBase64Field(value: unknown, fieldName: string): Uint8Array {
 export function GameWebView() {
   const webView = useRef<WebView | null>(null)
   const walletRequestInProgress = useRef(false)
+  const pullStartY = useRef<number | null>(null)
   const { width } = useWindowDimensions()
   const { account, connect, disconnect, signMessages, signTransactions } = useMobileWallet()
   const gameZoom = Math.min(MAX_GAME_ZOOM, Math.max(MIN_GAME_ZOOM, (GAME_ZOOM * width) / GAME_ZOOM_REFERENCE_WIDTH))
@@ -218,30 +219,39 @@ export function GameWebView() {
     setPullDistance(0)
     setIsRefreshing(true)
     webView.current?.reload()
-  }, [isPageLoaded, isRefreshing])
+  }, [isPageLoaded, isRefreshing, setIsRefreshing])
 
   const pullResponder = useMemo(
     () =>
       // PanResponder invokes these callbacks in response to gestures, not during render.
       // eslint-disable-next-line react-hooks/refs
       PanResponder.create({
+        onStartShouldSetPanResponderCapture: (event) => {
+          pullStartY.current = event.nativeEvent.pageY
+          return false
+        },
         onMoveShouldSetPanResponderCapture: (_event, gesture) =>
           isPageLoaded &&
           !isRefreshing &&
-          gesture.y0 <= PULL_START_ZONE &&
+          pullStartY.current !== null &&
+          pullStartY.current <= PULL_START_ZONE &&
           gesture.dy > 8 &&
           gesture.dy > Math.abs(gesture.dx) * 1.2,
         onPanResponderMove: (_event, gesture) => {
           setPullDistance(Math.min(gesture.dy * 0.55, INDICATOR_MAX_DISTANCE))
         },
         onPanResponderRelease: (_event, gesture) => {
+          pullStartY.current = null
           if (gesture.dy >= PULL_REFRESH_THRESHOLD && gesture.dy > Math.abs(gesture.dx) * 1.2) {
             refreshWebView()
           } else {
             setPullDistance(0)
           }
         },
-        onPanResponderTerminate: () => setPullDistance(0),
+        onPanResponderTerminate: () => {
+          pullStartY.current = null
+          setPullDistance(0)
+        },
       }),
     [isPageLoaded, isRefreshing, refreshWebView],
   )
