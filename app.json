@@ -42,6 +42,15 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 200
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
       ]
     ],
     "extra": {
@@ -50,11 +59,11 @@
         "projectId": "e51b52db-747f-416a-b030-afc2b67da0de"
       }
     },
-    "ios": {
-      "bundleIdentifier": "games.greendale.play",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e51b52db-747f-416a-b030-afc2b67da0de"
     }
   }
 }
